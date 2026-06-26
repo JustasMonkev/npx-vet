@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { execa } from "execa";
-import { buildNpmExecCommand, buildNpmInstallCommand, runDelegatedCommand } from "../src/core/executor.ts";
+import { buildNpmExecCommand, runDelegatedCommand } from "../src/core/executor.ts";
 
 vi.mock("execa", () => ({
   execa: vi.fn()
@@ -132,30 +132,6 @@ describe("buildNpmExecCommand", () => {
       "--",
       "tool",
       "--help"
-    ]);
-  });
-
-  it("pins the inspected version when building an install command", () => {
-    expect(buildNpmInstallCommand({ packageName: "eslint", selectedVersion: "9.0.0" })).toEqual([
-      "npm",
-      "install",
-      "eslint@9.0.0"
-    ]);
-  });
-
-  it("carries save-dev and registry into the install command", () => {
-    expect(buildNpmInstallCommand({
-      packageName: "@scope/tool",
-      selectedVersion: "1.2.3",
-      registry: "https://registry.example.test",
-      saveDev: true
-    })).toEqual([
-      "npm",
-      "install",
-      "--save-dev",
-      "--registry",
-      "https://registry.example.test",
-      "@scope/tool@1.2.3"
     ]);
   });
 

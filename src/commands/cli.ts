@@ -63,6 +63,7 @@ interface GateOptions {
 }
 
 const CLI_NAME = "npx-vet";
+const CLI_VERSION = "0.0.1";
 
 const defaultOutput: Output = {
   writeOut(message: string) {
@@ -104,6 +105,7 @@ export async function main(argv = process.argv.slice(2), output = defaultOutput,
 function buildProgram(output: Output, runtime: CliRuntime, setResult: (exitCode: number) => void): Command {
   const command = new Command()
     .name(CLI_NAME)
+    .version(CLI_VERSION)
     .description("Inspect npm package trust evidence before delegating to npm exec.")
     .showHelpAfterError()
     .exitOverride()

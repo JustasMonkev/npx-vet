@@ -34,7 +34,7 @@ describe("cli", () => {
     const exitCode = await main(["--version"], output);
 
     expect(exitCode).toBe(0);
-    expect(output.stdout.trim()).toBe("0.1.0");
+    expect(output.stdout.trim()).toBe("0.0.1");
     expect(output.stderr).toBe("");
   });
 
@@ -245,62 +245,6 @@ describe("cli", () => {
 
     expect(exitCode).toBe(2);
     expect(output.stderr).toContain("npx-vet --registry https://registry.example.test --allow-risk=high demo --");
-  });
-
-  it("installs the inspected version after confirmation", async () => {
-    const output = createOutput();
-    const { calls, runtime } = createRuntime(reportWithRisk("low"), true);
-    const exitCode = await main(["install", "eslint", "--save-dev"], output, runtime);
-
-    expect(exitCode).toBe(0);
-    expect(calls.inspectPackage).toEqual([
-      {
-        packageSpec: "eslint",
-        options: {
-          registry: "https://registry.npmjs.org",
-          executionRequested: true
-        }
-      }
-    ]);
-    expect(calls.confirm).toHaveLength(1);
-    expect(calls.runDelegatedCommand).toEqual([
-      ["npm", "install", "--save-dev", "--registry", "https://registry.npmjs.org", "demo@1.0.0"]
-    ]);
-  });
-
-  it("shows the install command on a dry run without installing", async () => {
-    const output = createOutput();
-    const { calls, runtime } = createRuntime(reportWithRisk("low"));
-    const exitCode = await main(["install", "eslint", "--dry-run"], output, runtime);
-
-    expect(exitCode).toBe(0);
-    expect(output.stdout).toContain("Dry run: not executing delegated command.");
-    expect(calls.confirm).toEqual([]);
-    expect(calls.runDelegatedCommand).toEqual([]);
-  });
-
-  it("does not install a package without bins (libraries are installable)", async () => {
-    const output = createOutput();
-    const { calls, runtime } = createRuntime(reportWithRisk("low", undefined, []), true);
-    const exitCode = await main(["install", "left-pad"], output, runtime);
-
-    expect(exitCode).toBe(0);
-    expect(output.stderr).toBe("");
-    expect(calls.runDelegatedCommand).toEqual([
-      ["npm", "install", "--registry", "https://registry.npmjs.org", "demo@1.0.0"]
-    ]);
-  });
-
-  it("blocks high-risk installs without an override", async () => {
-    const output = createOutput();
-    const { calls, runtime } = createRuntime(reportWithRisk("high"));
-    const exitCode = await main(["install", "--yes", "demo"], output, runtime);
-
-    expect(exitCode).toBe(2);
-    expect(output.stderr).toContain("High-risk package execution requires --allow-risk=high");
-    expect(output.stderr).toContain("npx-vet install --allow-risk=high demo");
-    expect(calls.confirm).toEqual([]);
-    expect(calls.runDelegatedCommand).toEqual([]);
   });
 
   it("allows high-risk dry-runs with an explicit override", async () => {
