@@ -1,0 +1,51 @@
+{
+  "name": "npx-vet",
+  "version": "0.0.1",
+  "description": "Inspect npm package trust evidence before delegating to npm exec.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "npx-vet": "./dist/commands/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "postbuild": "node -e \"require('fs').chmodSync('dist/commands/cli.js', 0o755)\"",
+    "prepack": "npm run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "inspect:eslint": "node dist/commands/cli.js inspect eslint --json",
+    "pack:dry": "npm pack --dry-run --json"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.5.2",
+    "commander": "^15.0.0",
+    "execa": "^9.6.1",
+    "npm-package-arg": "^13.0.2",
+    "pacote": "^21.5.1",
+    "semver": "^7.8.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "@types/npm-package-arg": "^6.1.4",
+    "@types/pacote": "^11.1.8",
+    "@types/semver": "^7.7.1",
+    "typescript": "7.0.1-rc",
+    "vitest": "^4.1.9"
+  }
+}

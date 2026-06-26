@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+.DS_Store
+.env
+.env.*
+npm-debug.log*
+vitest-report/
+.claude/
+.idea/
+
