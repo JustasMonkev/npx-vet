@@ -1,0 +1,137 @@
+{
+  "package.json": {
+    "size": 1465,
+    "mtime_ns": 1782555032474698103,
+    "hash": "a7232d90112e79fe7c458ff29229276af908d15bb3f9fa348ac1cdd502c9a243"
+  },
+  "src/commands/cli.ts": {
+    "size": 8543,
+    "mtime_ns": 1782495265686469508,
+    "hash": "0c6cbab9290cd0a1ac60751f10ac34fc4f216b5dd876e3f1954106df2f8ae757"
+  },
+  "src/core/commandDisplay.ts": {
+    "size": 670,
+    "mtime_ns": 1782479828520478801,
+    "hash": "9c0bbd8460caeb8dbca936992e5a149b5b231797efaf66ec9f1d7b4ceabb2dd3"
+  },
+  "src/core/diffAnalyzer.ts": {
+    "size": 8386,
+    "mtime_ns": 1782482059230690512,
+    "hash": "4373cde5e5e2e283a5751a0b319ed2d8ab3880f9fe424a588243b0e9685a4aee"
+  },
+  "src/core/executor.ts": {
+    "size": 1694,
+    "mtime_ns": 1782488116450233492,
+    "hash": "ec210ff62bf9eb608868973aa171f20ef9776a7a7e8e4699c228d85e4716c719"
+  },
+  "src/core/humanRenderer.ts": {
+    "size": 5331,
+    "mtime_ns": 1782479828693379540,
+    "hash": "a54d1e453245275bb6205a891e8948b92552ae03d69e951f07231407a8cae2e5"
+  },
+  "src/core/inspector.ts": {
+    "size": 4797,
+    "mtime_ns": 1782482024919309727,
+    "hash": "5d4ead2eba02b50ed6679f0f385b00be63cdaa0212ba8e128d66319d5101ee71"
+  },
+  "src/core/packageName.ts": {
+    "size": 116,
+    "mtime_ns": 1782481903777788881,
+    "hash": "9ff96176d18181c312c0488416f7dfef075b249fb567394dd9e1dfbcf3f234d6"
+  },
+  "src/core/packageSpec.ts": {
+    "size": 1072,
+    "mtime_ns": 1782480400768776634,
+    "hash": "517d9afde11f1e7c2487a65cb7e45b8cc165ac9ad090bbc8af005e1f2c01d68e"
+  },
+  "src/core/policy.ts": {
+    "size": 1593,
+    "mtime_ns": 1782482075745163500,
+    "hash": "0a8a87dd9ae9ce53ac3d1debe9d8a297da14bc7ffd81cb2c345d4c19a3c2f10d"
+  },
+  "src/core/registryClient.ts": {
+    "size": 1779,
+    "mtime_ns": 1782481966316776952,
+    "hash": "76ae7b1b366c6eb282384f6d9110294eec1772262acb22e36be878552b698238"
+  },
+  "src/core/riskEngine.ts": {
+    "size": 4980,
+    "mtime_ns": 1782482070290734727,
+    "hash": "99da29fffeec535894c2d0a420b09fba3ec4ee5f61165dfd7b585bca27bbc1cd"
+  },
+  "src/core/versionResolver.ts": {
+    "size": 4114,
+    "mtime_ns": 1782482036717466948,
+    "hash": "39fa2d91a84575b8c3312f3452de34ad18335fadb25ad338191918e5d1ac52aa"
+  },
+  "src/index.ts": {
+    "size": 704,
+    "mtime_ns": 1782479936933193573,
+    "hash": "9e235154f4f9b9c376ada3abd95e035bc21836812d2a2ba1bc3f0d09f3b0267e"
+  },
+  "src/types/reportSchema.ts": {
+    "size": 3906,
+    "mtime_ns": 1782480446412575997,
+    "hash": "17e5c82a3ebf1b85f4c821600394a034a1624c4fb89f003824c8e36d9f0b858c"
+  },
+  "tests/cli.test.ts": {
+    "size": 13112,
+    "mtime_ns": 1782495265796105327,
+    "hash": "06a03b8446079263156fecd767852c05443448c017fca32b01b6385fc20740c7"
+  },
+  "tests/diffAnalyzer.test.ts": {
+    "size": 3987,
+    "mtime_ns": 1782480471942858087,
+    "hash": "89b95212293953caac89006d4be26beb61b616cbe8ad5397d85a27a067ae2fa7"
+  },
+  "tests/executor.test.ts": {
+    "size": 3623,
+    "mtime_ns": 1782495265896290612,
+    "hash": "887f2c1c2ec4fa11cacdbf3c5e69f931c70dcbb39abcbc07c1aa30a490626faf"
+  },
+  "tests/humanRenderer.test.ts": {
+    "size": 3836,
+    "mtime_ns": 1782480063526887857,
+    "hash": "4c79837d61a22325a1f1e602371bedcb9763b3c2038722c1392cb71e1b64d437"
+  },
+  "tests/inspector.test.ts": {
+    "size": 3674,
+    "mtime_ns": 1782480352717477046,
+    "hash": "4072c5576db9a4165adf8c3833cd253864c271bc8cb565636850214f76da4f9c"
+  },
+  "tests/packageSpec.test.ts": {
+    "size": 1392,
+    "mtime_ns": 1782479973064852775,
+    "hash": "996b117b7952e59a0cf37f7956b9759aaada44a9e94313e5af209bcbc9920bed"
+  },
+  "tests/policy.test.ts": {
+    "size": 3979,
+    "mtime_ns": 1782480028689583797,
+    "hash": "59c8b293dde72724b14a64748a2f2774149568f377aff4784399eac501d9067a"
+  },
+  "tests/registryClient.test.ts": {
+    "size": 1945,
+    "mtime_ns": 1782480017285405747,
+    "hash": "4076727afcb0756c31c669b493af6e17419e43ac8201056ed492e520e8d81e59"
+  },
+  "tests/riskEngine.test.ts": {
+    "size": 2509,
+    "mtime_ns": 1782480073635858481,
+    "hash": "e7091045b0318db81fdd0a2390bd3ac44f9c26aefd38d19fb7bc7a53e6fd4b7c"
+  },
+  "tests/versionResolver.test.ts": {
+    "size": 5039,
+    "mtime_ns": 1782480757394335994,
+    "hash": "4c5a45fb130e3c0ec7c6915368e7447ed2ba469274efaebf05604f739d88e49f"
+  },
+  "tsconfig.json": {
+    "size": 550,
+    "mtime_ns": 1782479828436844354,
+    "hash": "654ff49746dc85d9b9215216d83482a81a458340319a90f7a17f70b9b34da960"
+  },
+  "README.md": {
+    "size": 1000,
+    "mtime_ns": 1782554536894190706,
+    "hash": "fd96392d3b1844bc7f0ae88b3b0fdc5e82b594f670f27ec0e5ce3c1e724714e0"
+  }
+}
