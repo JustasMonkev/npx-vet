@@ -1,6 +1,6 @@
 {
   "name": "npx-vet",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Inspect npm package trust evidence before delegating to npm exec.",
   "license": "MIT",
   "type": "module",

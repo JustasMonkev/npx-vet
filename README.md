@@ -2,8 +2,6 @@
 
 `npx-vet` inspects npm package trust evidence before it delegates to `npm exec`.
 
-It is built for Node.js 24+ with TypeScript 7 RC. Inspection is side-effect-free: it reads npm registry metadata, download counts, package manifests, and `npm diff` output without installing or executing the target package.
-
 ## Usage
 
 Inspect a package for humans:
