@@ -54,7 +54,8 @@ describe("inspectPackage", () => {
       "--registry",
       "https://registry.example.test"
     ], {
-      reject: false
+      reject: false,
+      timeout: 120_000
     });
     expect(report.registry.source).toBe("https://registry.example.test");
     expect(report.metadata.downloadsLastWeek).toBeNull();

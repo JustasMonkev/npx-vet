@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mkdtempSync, rmSync, symlinkSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -34,7 +34,7 @@ describe("cli", () => {
     const exitCode = await main(["--version"], output);
 
     expect(exitCode).toBe(0);
-    expect(output.stdout.trim()).toBe("0.0.1");
+    expect(output.stdout.trim()).toBe(JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).version);
     expect(output.stderr).toBe("");
   });
 

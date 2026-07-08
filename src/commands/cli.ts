@@ -2,6 +2,7 @@
 import { confirm as confirmPrompt } from "@inquirer/prompts";
 import { Command, CommanderError, Option } from "commander";
 import { realpathSync } from "node:fs";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { formatCommandForDisplay } from "../core/commandDisplay.ts";
 import { runDelegatedCommand as runDelegatedCommandImpl } from "../core/executor.ts";
@@ -63,7 +64,8 @@ interface GateOptions {
 }
 
 const CLI_NAME = "npx-vet";
-const CLI_VERSION = "0.0.1";
+// ponytail: single source of truth; ../../package.json resolves from both src/commands and dist/commands
+const CLI_VERSION = createRequire(import.meta.url)("../../package.json").version as string;
 
 const defaultOutput: Output = {
   writeOut(message: string) {
