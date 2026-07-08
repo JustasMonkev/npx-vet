@@ -59,7 +59,8 @@ export async function analyzeDiff(input: DiffInput): Promise<DiffSummary> {
     }
 
     const result = await execa("npm", args, {
-      reject: false
+      reject: false,
+      timeout: 120_000
     });
 
     if (result.exitCode !== 0) {

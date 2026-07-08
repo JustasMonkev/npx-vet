@@ -42,7 +42,8 @@ describe("diffAnalyzer", () => {
       "--registry",
       "https://registry.example.test"
     ], {
-      reject: false
+      reject: false,
+      timeout: 120_000
     });
     expect(diff.filesChanged).toEqual(["package.json"]);
     expect(diff.filesAdded).toEqual(["native/addon.node"]);

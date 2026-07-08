@@ -15,12 +15,14 @@ export async function fetchRegistryEvidence(
   options: { registry?: string } = {}
 ): Promise<RegistryEvidence> {
   const registry = options.registry ?? DEFAULT_REGISTRY;
-  const packument = await pacote.packument(spec.name, {
-    fullMetadata: true,
-    registry
-  }) as Packument;
-
-  const downloadsLastWeek = isNpmRegistry(registry) ? await fetchDownloadsLastWeek(spec.name) : null;
+  // ponytail: fire both requests at once; downloads fetch is failure-tolerant, its result is discarded if the packument throws
+  const [packument, downloadsLastWeek] = await Promise.all([
+    pacote.packument(spec.name, {
+      fullMetadata: true,
+      registry
+    }) as Promise<Packument>,
+    isNpmRegistry(registry) ? fetchDownloadsLastWeek(spec.name) : null
+  ]);
 
   return {
     packument,
@@ -41,7 +43,9 @@ export function getManifest(packument: Packument, version: string): PackageManif
 async function fetchDownloadsLastWeek(packageName: string): Promise<number | null> {
   const encoded = encodeURIComponent(packageName);
   try {
-    const response = await fetch(`https://api.npmjs.org/downloads/point/last-week/${encoded}`);
+    const response = await fetch(`https://api.npmjs.org/downloads/point/last-week/${encoded}`, {
+      signal: AbortSignal.timeout(5000)
+    });
     if (!response.ok) {
       return null;
     }
