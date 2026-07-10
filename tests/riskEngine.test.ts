@@ -5,6 +5,8 @@ import { evaluateRisk } from "../src/core/riskEngine.ts";
 describe("evaluateRisk", () => {
   it("flags high-risk lifecycle and binary changes", () => {
     const risk = evaluateRisk({
+      packageName: "demo",
+      typosquat: null,
       selectedManifest: selectedManifest(),
       previousManifest: previousManifest(),
       diff: diffSummary(),
@@ -31,7 +33,79 @@ describe("evaluateRisk", () => {
       "NO_REGISTRY_SIGNATURE"
     ]));
   });
+
+  it("flags one-edit typosquat candidates as high risk", () => {
+    const risk = evaluateRisk(cleanInput({
+      packageName: "esilnt",
+      typosquat: { target: "eslint", reason: "edit-distance", distance: 1 }
+    }));
+
+    expect(risk.level).toBe("high");
+    expect(risk.flags).toContainEqual({
+      id: "POSSIBLE_TYPOSQUAT",
+      level: "high",
+      message: 'Package name "esilnt" is 1 edit away from popular package "eslint"; verify you requested the intended package'
+    });
+  });
+
+  it("flags two-edit typosquat candidates as medium risk", () => {
+    const risk = evaluateRisk(cleanInput({
+      packageName: "nod-fetchh",
+      typosquat: { target: "node-fetch", reason: "edit-distance", distance: 2 }
+    }));
+
+    expect(risk.flags).toContainEqual({
+      id: "POSSIBLE_TYPOSQUAT",
+      level: "medium",
+      message: 'Package name "nod-fetchh" is 2 edits away from popular package "node-fetch"; verify you requested the intended package'
+    });
+  });
+
+  it("flags scope confusion as high risk", () => {
+    const risk = evaluateRisk(cleanInput({
+      packageName: "types-node",
+      typosquat: { target: "@types/node", reason: "scope-confusion", distance: 0 }
+    }));
+
+    expect(risk.flags).toContainEqual({
+      id: "POSSIBLE_TYPOSQUAT",
+      level: "high",
+      message: 'Package name "types-node" is the popular package "@types/node" with its scope flattened; verify you requested the intended package'
+    });
+  });
+
+  it("does not flag typosquats when no candidate was found", () => {
+    const risk = evaluateRisk(cleanInput({ packageName: "demo" }));
+
+    expect(risk.flags.map((flag) => flag.id)).not.toContain("POSSIBLE_TYPOSQUAT");
+  });
 });
+
+function cleanInput(overrides: Partial<Parameters<typeof evaluateRisk>[0]>): Parameters<typeof evaluateRisk>[0] {
+  return {
+    packageName: "demo",
+    typosquat: null,
+    selectedManifest: { name: "demo", version: "2.0.0" },
+    previousManifest: null,
+    diff: {
+      comparedFrom: "1.0.0",
+      comparedTo: "2.0.0",
+      filesAdded: [],
+      filesRemoved: [],
+      filesChanged: [],
+      newBins: [],
+      newLifecycleScripts: [],
+      dependencyChanges: [],
+      unavailableReason: null
+    },
+    downloadsLastWeek: 1_000_000,
+    publishTime: "2024-01-01T00:00:00.000Z",
+    previousPublishTime: "2023-12-01T00:00:00.000Z",
+    repository: "https://example.test/demo.git",
+    signaturePresent: true,
+    ...overrides
+  };
+}
 
 function previousManifest(): PackageManifest {
   return {

@@ -3,6 +3,7 @@ import { buildNpmExecCommand } from "./executor.ts";
 import { parsePackageSpec } from "./packageSpec.ts";
 import { fetchRegistryEvidence, getManifest } from "./registryClient.ts";
 import { evaluateRisk } from "./riskEngine.ts";
+import { findTyposquatCandidate } from "./typosquat.ts";
 import { packageReportSchema, type PackageManifest, type PackageReport } from "../types/reportSchema.ts";
 import { resolveVersions } from "./versionResolver.ts";
 
@@ -46,6 +47,8 @@ export async function inspectPackage(rawSpec: string, options: InspectOptions = 
     registry
   });
   const risk = evaluateRisk({
+    packageName: parsed.name,
+    typosquat: findTyposquatCandidate(parsed.name),
     selectedManifest,
     previousManifest,
     diff,

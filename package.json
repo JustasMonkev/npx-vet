@@ -29,6 +29,7 @@
     "prepack": "npm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
+    "update:popular-packages": "node scripts/update-popular-packages.mjs",
     "inspect:eslint": "node dist/commands/cli.js inspect eslint --json",
     "pack:dry": "npm pack --dry-run --json"
   },

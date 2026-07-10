@@ -1,7 +1,10 @@
 import type { DiffSummary, PackageManifest, RiskFlag, RiskLevel } from "../types/reportSchema.ts";
 import { hasNativeOrBinaryFile, lifecycleScriptNames } from "./diffAnalyzer.ts";
+import type { TyposquatMatch } from "./typosquat.ts";
 
 export interface RiskInput {
+  packageName: string;
+  typosquat: TyposquatMatch | null;
   selectedManifest: PackageManifest;
   previousManifest: PackageManifest | null;
   diff: DiffSummary;
@@ -29,6 +32,15 @@ export function evaluateRisk(input: RiskInput): RiskResult {
   const addFlag = (id: string, level: RiskFlag["level"], message: string) => {
     flags.push({ id, level, message });
   };
+
+  if (input.typosquat) {
+    addFlag(
+      "POSSIBLE_TYPOSQUAT",
+      // A single edit or a flattened scope is a classic squat; two edits is weaker evidence.
+      input.typosquat.reason === "edit-distance" && input.typosquat.distance > 1 ? "medium" : "high",
+      typosquatMessage(input.packageName, input.typosquat)
+    );
+  }
 
   if (input.selectedManifest.deprecated) {
     addFlag("DEPRECATED_PACKAGE", "high", `Package is deprecated: ${input.selectedManifest.deprecated}`);
@@ -109,6 +121,14 @@ export function evaluateRisk(input: RiskInput): RiskResult {
     score,
     flags
   };
+}
+
+function typosquatMessage(packageName: string, match: TyposquatMatch): string {
+  if (match.reason === "scope-confusion") {
+    return `Package name "${packageName}" is the popular package "${match.target}" with its scope flattened; verify you requested the intended package`;
+  }
+
+  return `Package name "${packageName}" is ${match.distance} edit${match.distance === 1 ? "" : "s"} away from popular package "${match.target}"; verify you requested the intended package`;
 }
 
 function riskLevelFromFlags(flags: RiskFlag[]): RiskLevel {

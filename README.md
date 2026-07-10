@@ -45,6 +45,19 @@ npx-vet --allow-risk=high some-package -- --help
 - package size, file count, bins, lifecycle scripts
 - npm registry signature metadata when visible
 - file-level `npm diff` summary
+- typosquat similarity against the top 5,000 npm package names
 - machine-readable risk flags
+
+## Typosquat Detection
+
+Requested package names are compared against a bundled list of the top
+5,000 npm packages (generated from
+[`npm-high-impact`](https://www.npmjs.com/package/npm-high-impact) via
+`npm run update:popular-packages`). A name that is one edit away from a
+popular package (`esilnt` vs `eslint`), or a popular scoped package with
+its scope flattened (`types-node` vs `@types/node`), raises a high
+`POSSIBLE_TYPOSQUAT` flag and blocks execution unless overridden. Two
+edits on longer names raises a medium flag. Popular packages themselves
+are never flagged.
 
 These signals are evidence, not proof that a package is safe.
