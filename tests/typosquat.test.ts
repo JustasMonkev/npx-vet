@@ -8,6 +8,7 @@ const POPULAR = [
   "node-fetch",
   "minimatch",
   "@types/node",
+  "@types/ws",
   "@babel/core",
   "ms"
 ];
@@ -71,6 +72,20 @@ describe("findTyposquatCandidate", () => {
       target: "@babel/core",
       reason: "scope-confusion",
       distance: 0
+    });
+    expect(findTyposquatCandidate("typesnode", POPULAR)).toEqual({
+      target: "@types/node",
+      reason: "scope-confusion",
+      distance: 0
+    });
+  });
+
+  it("applies length thresholds to basenames under a shared scope", () => {
+    expect(findTyposquatCandidate("@types/gm", POPULAR)).toBeNull();
+    expect(findTyposquatCandidate("@types/nodee", POPULAR)).toEqual({
+      target: "@types/node",
+      reason: "edit-distance",
+      distance: 1
     });
   });
 

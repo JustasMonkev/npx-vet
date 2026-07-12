@@ -36,12 +36,26 @@ function findScopeConfusion(packageName: string, popularPackages: readonly strin
   }
 
   for (const candidate of popularPackages) {
-    if (candidate.startsWith("@") && candidate.slice(1).replace("/", "-") === packageName) {
+    if (!candidate.startsWith("@")) {
+      continue;
+    }
+    const unscoped = candidate.slice(1);
+    if (unscoped.replace("/", "-") === packageName || unscoped.replace("/", "") === packageName) {
       return { target: candidate, reason: "scope-confusion", distance: 0 };
     }
   }
 
   return null;
+}
+
+function stripSharedScope(packageName: string, candidate: string): [string, string] {
+  if (packageName.startsWith("@") && candidate.startsWith("@")) {
+    const scopeEnd = packageName.indexOf("/");
+    if (scopeEnd !== -1 && candidate.startsWith(packageName.slice(0, scopeEnd + 1))) {
+      return [packageName.slice(scopeEnd + 1), candidate.slice(scopeEnd + 1)];
+    }
+  }
+  return [packageName, candidate];
 }
 
 function allowedDistance(length: number): number {
@@ -58,9 +72,11 @@ function findEditDistanceMatch(packageName: string, popularPackages: readonly st
 
   let best: TyposquatMatch | null = null;
   for (const candidate of popularPackages) {
-    // Deletions shorten the typo below the target, so budget by the longer name.
-    const maxDistance = allowedDistance(Math.max(packageName.length, candidate.length));
-    if (Math.abs(candidate.length - packageName.length) > maxDistance) {
+    // A shared scope contributes zero edits, so budget by the basenames there;
+    // otherwise deletions shorten the typo below the target, so budget by the longer name.
+    const [a, b] = stripSharedScope(packageName, candidate);
+    const maxDistance = allowedDistance(Math.max(a.length, b.length));
+    if (maxDistance === 0 || Math.abs(candidate.length - packageName.length) > maxDistance) {
       continue;
     }
 
