@@ -44,21 +44,31 @@ function findScopeConfusion(packageName: string, popularPackages: readonly strin
   return null;
 }
 
+function allowedDistance(length: number): number {
+  if (length >= TWO_EDIT_MIN_LENGTH) {
+    return 2;
+  }
+  return length >= MIN_EDIT_DISTANCE_LENGTH ? 1 : 0;
+}
+
 function findEditDistanceMatch(packageName: string, popularPackages: readonly string[]): TyposquatMatch | null {
-  const maxDistance = packageName.length >= TWO_EDIT_MIN_LENGTH
-    ? 2
-    : packageName.length >= MIN_EDIT_DISTANCE_LENGTH ? 1 : 0;
-  if (maxDistance === 0) {
+  if (packageName.length < MIN_EDIT_DISTANCE_LENGTH) {
     return null;
   }
 
   let best: TyposquatMatch | null = null;
   for (const candidate of popularPackages) {
+    // Deletions shorten the typo below the target, so budget by the longer name.
+    const maxDistance = allowedDistance(Math.max(packageName.length, candidate.length));
     if (Math.abs(candidate.length - packageName.length) > maxDistance) {
       continue;
     }
 
-    const distance = damerauLevenshtein(packageName, candidate, best ? best.distance - 1 : maxDistance);
+    const distance = damerauLevenshtein(
+      packageName,
+      candidate,
+      best ? Math.min(maxDistance, best.distance - 1) : maxDistance
+    );
     if (distance !== null) {
       // The list is popularity-ordered, so on ties the earlier (more popular) candidate wins.
       best = { target: candidate, reason: "edit-distance", distance };

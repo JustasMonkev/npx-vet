@@ -6,6 +6,7 @@ const POPULAR = [
   "lodash",
   "cross-env",
   "node-fetch",
+  "minimatch",
   "@types/node",
   "@babel/core",
   "ms"
@@ -42,6 +43,14 @@ describe("findTyposquatCandidate", () => {
       distance: 1
     });
     expect(findTyposquatCandidate("lodhsa", POPULAR)).toBeNull();
+  });
+
+  it("matches two-deletion typos of longer names even when the typo itself is short", () => {
+    expect(findTyposquatCandidate("minimat", POPULAR)).toEqual({
+      target: "minimatch",
+      reason: "edit-distance",
+      distance: 2
+    });
   });
 
   it("matches scoped lookalikes", () => {
