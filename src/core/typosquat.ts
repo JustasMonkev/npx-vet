@@ -48,14 +48,28 @@ function findScopeConfusion(packageName: string, popularPackages: readonly strin
   return null;
 }
 
-function stripSharedScope(packageName: string, candidate: string): [string, string] {
+// The string pairs actually worth edit-distancing for a candidate. A shared
+// scope contributes zero edits, so compare basenames there; an unscoped
+// request is compared against a scoped candidate's flattened spellings so a
+// typo of "types-node" is still measured against "@types/node".
+function comparablePairs(packageName: string, candidate: string): [string, string][] {
   if (packageName.startsWith("@") && candidate.startsWith("@")) {
     const scopeEnd = packageName.indexOf("/");
     if (scopeEnd !== -1 && candidate.startsWith(packageName.slice(0, scopeEnd + 1))) {
-      return [packageName.slice(scopeEnd + 1), candidate.slice(scopeEnd + 1)];
+      return [[packageName.slice(scopeEnd + 1), candidate.slice(scopeEnd + 1)]];
     }
+    return [[packageName, candidate]];
   }
-  return [packageName, candidate];
+
+  if (!packageName.startsWith("@") && candidate.startsWith("@")) {
+    const unscoped = candidate.slice(1);
+    return [
+      [packageName, unscoped.replace("/", "-")],
+      [packageName, unscoped.replace("/", "")]
+    ];
+  }
+
+  return [[packageName, candidate]];
 }
 
 function allowedDistance(length: number): number {
@@ -72,25 +86,22 @@ function findEditDistanceMatch(packageName: string, popularPackages: readonly st
 
   let best: TyposquatMatch | null = null;
   for (const candidate of popularPackages) {
-    // A shared scope contributes zero edits, so budget by the basenames there;
-    // otherwise deletions shorten the typo below the target, so budget by the longer name.
-    const [a, b] = stripSharedScope(packageName, candidate);
-    const maxDistance = allowedDistance(Math.max(a.length, b.length));
-    if (maxDistance === 0 || Math.abs(candidate.length - packageName.length) > maxDistance) {
-      continue;
+    for (const [a, b] of comparablePairs(packageName, candidate)) {
+      // Deletions shorten the typo below the target, so budget by the longer name.
+      const maxDistance = allowedDistance(Math.max(a.length, b.length));
+      if (maxDistance === 0 || Math.abs(a.length - b.length) > maxDistance) {
+        continue;
+      }
+
+      const distance = damerauLevenshtein(a, b, best ? Math.min(maxDistance, best.distance - 1) : maxDistance);
+      if (distance !== null) {
+        // The list is popularity-ordered, so on ties the earlier (more popular) candidate wins.
+        best = { target: candidate, reason: "edit-distance", distance };
+      }
     }
 
-    const distance = damerauLevenshtein(
-      packageName,
-      candidate,
-      best ? Math.min(maxDistance, best.distance - 1) : maxDistance
-    );
-    if (distance !== null) {
-      // The list is popularity-ordered, so on ties the earlier (more popular) candidate wins.
-      best = { target: candidate, reason: "edit-distance", distance };
-      if (distance === 1) {
-        break;
-      }
+    if (best?.distance === 1) {
+      break;
     }
   }
 

@@ -80,6 +80,19 @@ describe("findTyposquatCandidate", () => {
     });
   });
 
+  it("matches typos of flattened scoped spellings", () => {
+    expect(findTyposquatCandidate("types-nodee", POPULAR)).toEqual({
+      target: "@types/node",
+      reason: "edit-distance",
+      distance: 1
+    });
+    expect(findTyposquatCandidate("bablecore", POPULAR)).toEqual({
+      target: "@babel/core",
+      reason: "edit-distance",
+      distance: 1
+    });
+  });
+
   it("applies length thresholds to basenames under a shared scope", () => {
     expect(findTyposquatCandidate("@types/gm", POPULAR)).toBeNull();
     expect(findTyposquatCandidate("@types/nodee", POPULAR)).toEqual({
