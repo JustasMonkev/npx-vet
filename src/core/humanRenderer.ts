@@ -50,7 +50,10 @@ export function renderHumanReport(report: PackageReport): string {
     "Risk flags",
     ...renderRiskFlagTable(report.risk.flags),
     "",
-    `Would run: ${formatCommandForDisplay(report.execution.delegatedCommand)}`,
+    // Don't hand out a copy-pasteable command for a package we consider high risk.
+    report.risk.level === "high"
+      ? "Command withheld: risk verdict is HIGH."
+      : `Would run: ${formatCommandForDisplay(report.execution.delegatedCommand)}`,
     "",
     "These signals are evidence, not proof that the package is safe."
   ];
