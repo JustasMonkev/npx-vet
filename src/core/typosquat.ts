@@ -63,14 +63,21 @@ function comparablePairs(packageName: string, candidate: string): [string, strin
 
   if (!packageName.startsWith("@") && candidate.startsWith("@")) {
     const [scope, base] = candidate.slice(1).split("/");
-    // When the request carries the flattened scope prefix itself, the scope
-    // contributes zero edits — budget by the basenames, as for real scopes.
-    return ["-", ""].map((joiner): [string, string] => {
+    // When the request carries a flattened scope prefix, the scope contributes
+    // zero edits — budget by the basenames, as for real scopes. The full-string
+    // spellings are only compared when no prefix matches, so the scope's length
+    // can never buy edit budget the basename guard already refused.
+    const stripped: [string, string][] = [];
+    const full: [string, string][] = [];
+    for (const joiner of ["-", ""]) {
       const prefix = scope + joiner;
-      return packageName.startsWith(prefix)
-        ? [packageName.slice(prefix.length), base]
-        : [packageName, prefix + base];
-    });
+      if (packageName.startsWith(prefix)) {
+        stripped.push([packageName.slice(prefix.length), base]);
+      } else {
+        full.push([packageName, prefix + base]);
+      }
+    }
+    return stripped.length > 0 ? stripped : full;
   }
 
   return [[packageName, candidate]];

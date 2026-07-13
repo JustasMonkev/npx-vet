@@ -96,6 +96,8 @@ describe("findTyposquatCandidate", () => {
   it("applies length thresholds to basenames under a shared scope", () => {
     expect(findTyposquatCandidate("@types/gm", POPULAR)).toBeNull();
     expect(findTyposquatCandidate("types-gm", POPULAR)).toBeNull();
+    expect(findTyposquatCandidate("typeswss", POPULAR)).toBeNull();
+    expect(findTyposquatCandidate("typeswz", POPULAR)).toBeNull();
     expect(findTyposquatCandidate("@types/nodee", POPULAR)).toEqual({
       target: "@types/node",
       reason: "edit-distance",
