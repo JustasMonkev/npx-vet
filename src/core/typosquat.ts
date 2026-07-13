@@ -62,11 +62,15 @@ function comparablePairs(packageName: string, candidate: string): [string, strin
   }
 
   if (!packageName.startsWith("@") && candidate.startsWith("@")) {
-    const unscoped = candidate.slice(1);
-    return [
-      [packageName, unscoped.replace("/", "-")],
-      [packageName, unscoped.replace("/", "")]
-    ];
+    const [scope, base] = candidate.slice(1).split("/");
+    // When the request carries the flattened scope prefix itself, the scope
+    // contributes zero edits — budget by the basenames, as for real scopes.
+    return ["-", ""].map((joiner): [string, string] => {
+      const prefix = scope + joiner;
+      return packageName.startsWith(prefix)
+        ? [packageName.slice(prefix.length), base]
+        : [packageName, prefix + base];
+    });
   }
 
   return [[packageName, candidate]];
