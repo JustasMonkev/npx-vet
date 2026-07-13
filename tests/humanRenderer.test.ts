@@ -11,11 +11,23 @@ describe("renderHumanReport", () => {
     expect(output).toMatch(/\| Verdict\s+\| HIGH \(score 45\)/);
     expect(output).toContain("| Level    | Flag");
     expect(output).toContain("| high     | NEW_LIFECYCLE_SCRIPT");
+    expect(output).toContain("Command withheld: risk verdict is HIGH.");
+    expect(output).not.toContain("Would run:");
+  });
+
+  it("shows the delegated command when risk is below high", () => {
+    const report = createReport();
+    report.risk.level = "medium";
+    report.risk.score = 20;
+
+    const output = renderHumanReport(report);
+
     expect(output).toContain("Would run: npm exec --yes --package demo@1.0.0 -- demo --version");
   });
 
   it("quotes shell-sensitive command tokens and strips terminal controls", () => {
     const report = createReport();
+    report.risk.level = "medium";
     report.package.name = "demo\u001B[2J";
     report.risk.flags[0] = {
       id: "NEW_LIFECYCLE_SCRIPT",
