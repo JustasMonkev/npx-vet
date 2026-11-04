@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { confirm as confirmPrompt } from "@inquirer/prompts";
+import confirmPrompt from "@inquirer/confirm";
 import { Command, CommanderError, Option } from "commander";
 import { realpathSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -33,11 +33,7 @@ interface InspectCommandOptions {
 
 interface CliRuntime {
   confirm(options: { message: string; default: boolean }): Promise<boolean>;
-  inspectPackage(packageSpec: string, options: {
-    registry?: string;
-    executionRequested?: boolean;
-    targetArgs?: string[];
-  }): Promise<PackageReport>;
+  inspectPackage: typeof inspectPackageImpl;
   renderHumanReport(report: PackageReport): string;
   runDelegatedCommand(command: string[]): Promise<number>;
 }
@@ -50,17 +46,6 @@ interface RootRunOptions {
   yes: boolean;
   dryRun: boolean;
   registry?: string;
-}
-
-interface GateOptions {
-  report: PackageReport;
-  delegatedCommand: string[];
-  policy: HumanPolicy;
-  allowRisk: RiskLevel | null;
-  yes: boolean;
-  dryRun: boolean;
-  overrideCommand: string[];
-  cancelledMessage: string;
 }
 
 const CLI_NAME = "npx-vet";
@@ -186,21 +171,8 @@ async function runRootCommand(options: RootRunOptions, output: Output, runtime: 
     return 2;
   }
 
-  return gateAndDelegate({
-    report,
-    delegatedCommand: report.execution.delegatedCommand,
-    policy: options.policy,
-    allowRisk: options.allowRisk,
-    yes: options.yes,
-    dryRun: options.dryRun,
-    overrideCommand: buildOverrideCommand(options, report.risk.level),
-    cancelledMessage: "Cancelled. Target package was not executed."
-  }, output, runtime);
-}
-
-async function gateAndDelegate(options: GateOptions, output: Output, runtime: CliRuntime): Promise<number> {
   const decision = evaluateHumanPolicy({
-    report: options.report,
+    report,
     policy: options.policy,
     allowRisk: options.allowRisk,
     yes: options.yes
@@ -208,7 +180,7 @@ async function gateAndDelegate(options: GateOptions, output: Output, runtime: Cl
 
   if (decision.blocked) {
     output.writeErr(`\nBlocked: ${decision.reason}\n`);
-    output.writeErr(`Override example: ${formatCommandForDisplay(options.overrideCommand)}\n`);
+    output.writeErr(`Override example: ${formatCommandForDisplay(buildOverrideCommand(options, report.risk.level))}\n`);
     return 2;
   }
 
@@ -217,17 +189,18 @@ async function gateAndDelegate(options: GateOptions, output: Output, runtime: Cl
     return 0;
   }
 
+  const { delegatedCommand } = report.execution;
   const approved = decision.autoApproved || await runtime.confirm({
-    message: `Proceed with ${formatCommandForDisplay(options.delegatedCommand)}?`,
+    message: `Proceed with ${formatCommandForDisplay(delegatedCommand)}?`,
     default: false
   });
 
   if (!approved) {
-    output.writeOut(`${options.cancelledMessage}\n`);
+    output.writeOut("Cancelled. Target package was not executed.\n");
     return 1;
   }
 
-  return runtime.runDelegatedCommand(options.delegatedCommand);
+  return runtime.runDelegatedCommand(delegatedCommand);
 }
 
 function effectiveInspectRegistry(inspectRegistry: string, rootRegistry: string): string {
