@@ -76,17 +76,11 @@ export async function analyzeDiff(input: DiffInput): Promise<DiffSummary> {
 }
 
 export function hasNativeOrBinaryFile(diff: DiffSummary): boolean {
-  const allFiles = [
-    ...diff.filesAdded,
-    ...diff.filesChanged,
-    ...(diff.binaryFiles ?? [])
-  ];
-
   if ((diff.binaryFiles ?? []).length > 0) {
     return true;
   }
 
-  return allFiles.some((file) => {
+  return [...diff.filesAdded, ...diff.filesChanged].some((file) => {
     const lowerCaseFile = file.toLowerCase();
     return NATIVE_OR_BINARY_EXTENSIONS.some((extension) => lowerCaseFile.endsWith(extension));
   });
@@ -98,13 +92,13 @@ function parseNpmDiffOutput(output: string): Pick<DiffSummary, "filesAdded" | "f
   let current: { file: string; status: "added" | "removed" | "changed" } | null = null;
 
   for (const line of output.split("\n")) {
-    const diffPaths = parseDiffGitLine(line);
-    if (diffPaths) {
+    const changedPath = parseDiffGitLine(line);
+    if (changedPath !== null) {
       if (current) {
         entries.push(current);
       }
       current = {
-        file: diffPaths.after,
+        file: changedPath,
         status: "changed"
       };
       continue;
@@ -157,13 +151,10 @@ function parseNpmDiffOutput(output: string): Pick<DiffSummary, "filesAdded" | "f
   };
 }
 
-function parseDiffGitLine(line: string): { before: string; after: string } | null {
+function parseDiffGitLine(line: string): string | null {
   const unquoted = /^diff --git a\/(.+) b\/(.+)$/.exec(line);
   if (unquoted) {
-    return {
-      before: unquoted[1] ?? "",
-      after: unquoted[2] ?? ""
-    };
+    return unquoted[2];
   }
 
   const quoted = /^diff --git ("(?:\\.|[^"])+") ("(?:\\.|[^"])+")$/.exec(line);
@@ -171,10 +162,7 @@ function parseDiffGitLine(line: string): { before: string; after: string } | nul
     return null;
   }
 
-  return {
-    before: stripDiffPrefix(decodeGitPath(quoted[1] ?? "")),
-    after: stripDiffPrefix(decodeGitPath(quoted[2] ?? ""))
-  };
+  return parseDiffPath(quoted[2]);
 }
 
 function parseBinaryFilesLine(line: string): string | null {

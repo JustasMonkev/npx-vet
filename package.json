@@ -37,20 +37,20 @@
     "node": ">=24.0.0"
   },
   "dependencies": {
-    "@inquirer/prompts": "^8.5.2",
+    "@inquirer/confirm": "^6.3.5",
     "commander": "^15.0.0",
-    "execa": "^9.6.1",
+    "execa": "^10.2.1",
     "npm-package-arg": "^13.0.2",
-    "pacote": "^21.5.1",
-    "semver": "^7.8.5",
-    "zod": "^4.4.3"
+    "pacote": "^21.5.2",
+    "semver": "^7.8.6",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@types/node": "^26.0.0",
+    "@types/node": "^26.6.6",
     "@types/npm-package-arg": "^6.1.4",
     "@types/pacote": "^11.1.8",
-    "@types/semver": "^7.7.1",
-    "typescript": "7.0.1-rc",
-    "vitest": "^4.1.9"
+    "@types/semver": "^7.8.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
   }
 }
