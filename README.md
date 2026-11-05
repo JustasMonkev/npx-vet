@@ -2,13 +2,20 @@
 
 `npx-vet` inspects npm package trust evidence before it delegates to `npm exec`.
 
-## Usage
+## Quick Start
 
-Inspect a package for humans:
+Requires Node.js **24.0.0 or newer** and npm.
+
+Install the CLI, then inspect your first package:
 
 ```sh
+npm install --global npx-vet
 npx-vet inspect eslint
 ```
+
+`inspect` reports package evidence without installing or executing the target package.
+
+## Usage
 
 Inspect a package for agents:
 
@@ -17,17 +24,19 @@ npx-vet inspect eslint --json
 npx-vet inspect eslint --json --fail-on=high
 ```
 
-Preflight a command without executing it:
+Dry-run: inspect, check execution policy, and show the delegated command without running it:
 
 ```sh
 npx-vet --dry-run eslint -- --version
 ```
 
-Run after inspection and approval:
+Execute: inspect, then ask for approval before running the target package via `npm exec`:
 
 ```sh
 npx-vet eslint -- --version
 ```
+
+Arguments after `--` are passed to the target executable (here, `eslint --version`).
 
 High-risk packages are blocked unless explicitly overridden:
 
